@@ -4,7 +4,7 @@ function Header() {
   return (
     <header className="flex justify-between p-5 mx-auto max-w-7xl">
       <div className="flex items-center space-x-5 ">
-        <Link href="/posting"passHref>
+        <Link href="/"passHref>
           <img
             src="https://links.papareact.com/yvf"
             className="object-contain cursor-pointer w-44"

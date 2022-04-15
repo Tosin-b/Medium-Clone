@@ -41,6 +41,7 @@ export default function Home({posts}: Props) {
 export const getServerSideProps = async ()=>{
   const query = `*[_type == "post"]{
     _id,
+    _createdAt,
     title,
     slug,
     author ->{
