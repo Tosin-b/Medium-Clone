@@ -15,9 +15,18 @@ interface IformInput{
   comment: string
 }
 function Post({ post }: Props) {
-  const { register, handleSubmit, watch, formState: { errors } } = useForm();
-
-  console.log(post)
+  const { register, handleSubmit, watch, formState: { errors } } = useForm<IformInput>();
+const onSubmit: SubmitHandler<IformInput> = async(data) =>{
+  await fetch('/api/createComment',{
+    method:'POST',
+    body: JSON.stringify(data),
+  }).then(()=>{
+    console.log(data)
+  }).catch((err)=>{
+    console.log(err)
+  })
+}
+  //console.log(post)
   return (
     <main>
       <Header />
@@ -71,29 +80,44 @@ function Post({ post }: Props) {
         </div>
       </article>
       <hr className='max-w-lg mx-auto my-5 border border-y-yellow-300'/>
-        <form className='flex flex-col max-w-2xl p-5 mx-auto'>
+        <form  onSubmit={handleSubmit(onSubmit)} className='flex flex-col max-w-2xl p-5 mx-auto'>
           <h3 className='text-sm text-yellow-500'>Enjoy the artice ?</h3>
           <h4 className='text-3xl font-bold'>Leave a Comment Below!</h4>
           <hr className='py-3 mt-2'/>
 
           {/* //add the react hook form */}
           <input
-          
+          {...register("_id")}
+          type={'hidden'}
+          name='_id'
+          value={post._id}
           />
 
           <label className="block mb-5">
             <span className='text-gray-700'>Name</span>
-            <input className='block w-full px-3 py-2 mt-1 border rounded shadow outline-none form-input focus:ring-yellow-400 ring' placeholder='John Appleseed' type="text"></input>
+            <input           {...register("name" , {required: true})}
+ className='block w-full px-3 py-2 mt-1 border rounded shadow outline-none form-input focus:ring-yellow-400 ring' placeholder='John Appleseed' type="text"></input>
           </label>
           <label className='block mb-5'>
             <span className='text-gray-700'>Email</span>
-            <input className='block w-full px-3 py-2 mt-1 border rounded shadow outline-none bg form-input focus:ring-yellow-400 ring' placeholder='John Appleseed' type="text"></input>
+            <input  {...register("email" , {required: true})} className='block w-full px-3 py-2 mt-1 border rounded shadow outline-none bg form-input focus:ring-yellow-400 ring' placeholder='John Appleseed' type="text"></input>
           </label>
           <label className='block mb-5'>
             <span className='text-gray-700'>Comment</span>
-            <textarea className='block w-full px-3 py-2 mt-1 border rounded shadow outline-none form-textarea focus:ring-yellow-400 ring' placeholder='John Appleseed' rows={8}/>
+            <textarea   {...register("comment" , {required: true})}className='block w-full px-3 py-2 mt-1 border rounded shadow outline-none form-textarea focus:ring-yellow-400 ring' placeholder='John Appleseed' rows={8}/>
           </label>
-         
+         <div className='flex flex-col p-5'>
+           {errors.name &&(
+             <span className='text-red-500' > The name field is Required</span>
+           )}
+           {errors.comment &&(
+             <span className='text-red-500' > The Comment field is Required</span>
+           )}
+           {errors.email &&(
+             <span className='text-red-500' > The email field is Required</span>
+           )}
+         </div>
+         <input type={'submit'} className='px-4 py-2 font-bold text-white bg-yellow-500 rounded shadow cursor-pointer hover:bg-yellow-400 focus:shadow-outline focus:outline-none'/>
         </form>
       
     </main>
