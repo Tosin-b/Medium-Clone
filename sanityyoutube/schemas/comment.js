@@ -29,5 +29,5 @@ export default {
         to:[{type:'post'}],
       },
     ],
-}
+};
   
