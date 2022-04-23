@@ -5,6 +5,7 @@ import { sanityClient, urlFor } from '../../sanity'
 import { Post } from '../../typings'
 import PortableText from 'react-portable-text'
 import {useForm, SubmitHandler} from 'react-hook-form'
+import { useState } from 'react'
 interface Props {
   post: Post
 }
@@ -15,6 +16,8 @@ interface IformInput{
   comment: string
 }
 function Post({ post }: Props) {
+  console.log(post)
+  const [submitted, setSubmitted] = useState(false)
   const { register, handleSubmit, watch, formState: { errors } } = useForm<IformInput>();
 const onSubmit: SubmitHandler<IformInput> = (data) =>{
    fetch('/api/createComment',{
@@ -22,7 +25,9 @@ const onSubmit: SubmitHandler<IformInput> = (data) =>{
     body: JSON.stringify(data),
   }).then(()=>{
     console.log(data)
+    setSubmitted(true)
   }).catch((err)=>{
+    setSubmitted(false)
     console.log(err)
   })
 }
@@ -80,6 +85,12 @@ const onSubmit: SubmitHandler<IformInput> = (data) =>{
         </div>
       </article>
       <hr className='max-w-lg mx-auto my-5 border border-y-yellow-300'/>
+      {submitted ?(
+        <div className='flex flex-col max-w-2xl py-10 mx-auto my-10 text-white bg-yellow-500'>
+          <h3 className='text-3xl font-bold'>Thank you for submitting your comment!</h3>
+          <p>Once it has been approved it will appear</p>
+        </div>
+      ):(
         <form  onSubmit={handleSubmit(onSubmit)} className='flex flex-col max-w-2xl p-5 mx-auto'>
           <h3 className='text-sm text-yellow-500'>Enjoy the artice ?</h3>
           <h4 className='text-3xl font-bold'>Leave a Comment Below!</h4>
@@ -119,10 +130,22 @@ const onSubmit: SubmitHandler<IformInput> = (data) =>{
          </div>
          <input type={'submit'} className='px-4 py-2 font-bold text-white bg-yellow-500 rounded shadow cursor-pointer hover:bg-yellow-400 focus:shadow-outline focus:outline-none'/>
         </form>
+      )}
+       {/* { comments } */}
+<div className='flex flex-col max-w-2xl p-10 mx-auto my-10 space-y-2 shadow shadow-yellow-500'>
+  <h3 className='text-4xl'>Comments</h3>
+  <hr className='pb-2'/>
+  {post.comments.map((comment)=>(
+    <div key={comment._id}>
+      <p> <span className='text-yellow-500'>{comment.name}</span>:{comment.comment}</p>
+    </div>  
+  ))}
+</div> 
       
     </main>
   )
 }
+
 
 export default Post
 
@@ -154,6 +177,9 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
           name,
           image
            },
+           'comments': *[
+            _type == 'comment' &&
+            post._ref == ^._id],
         description,
         mainImage,
         slug,
